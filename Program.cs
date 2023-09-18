@@ -1,55 +1,75 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace ConsoleApp1
+namespace Arrays
 {
     internal class Program
     {
-        // Точка входа в программу
         static void Main(string[] args)
         {
-            Console.WriteLine("Вывод текста в консоль и переносим строку");
-            // 2 строки выводятся без переноса
-            Console.Write("Вывод текста в консоль и переносим");
-            Console.Write(" текст на той же строке");
+            // Инициализация массива numbers
+            List<int> numbers = new List<int> { 1, 2, 3 };
 
-            // Читаем из консоли строку и помещаем ее в переменную str_1_val
-            string str_1_val = Console.ReadLine();
-            // Выводим в консоль строку str_1_val
-            Console.WriteLine(str_1_val);
+            // Добавлить в массив элемент
+            numbers.Add(153);
 
-            // Читаем из консоли строку и помещаем ее в переменную str_2_val
-            string str_2_val = Console.ReadLine();
-            // Вытаскиваем из строки str_2_val число и помещаем его в int_1_val
-            Int32 int_1_val = Int32.Parse(str_2_val);
+            // Инициализация массива numbers2
+            List<int> numbers2 = new List<int> { -1, -2, -3 };
 
-            // Создаем новую перменную и оставляем ее пустой (пока)
-            Int32 int_2_val;
-            // ПЫТАЕМСЯ ватащить из введеной в консоль строки  число и помещаем ее в переменную int_2_val,
-            // если удалось вытащить чилсло функция возвращает значние true, иначе false
-            bool bool_val = Int32.TryParse(Console.ReadLine(), out int_2_val);
+            // Добавляем значения из одного массива в другой
+            numbers.AddRange(numbers2);
 
-
-            // Условия (такие же как в JavaScript)
-            if (bool_val  == true)
+            // Цикл for
+            // Вывод массива
+            for (int i = 0; i < numbers.Count; i++)
             {
-                // если true
-                Console.WriteLine(int_2_val);
+                Console.WriteLine(numbers[i]);
             }
-            else
+            // Создаем строку путем присоединения элементов массива друг к другу,
+            // разделяя символом " " (т.е. пробелом. Соответственно если нужно вывести
+            // через запятую используем ","
+            string str_numbers = String.Join(" ", numbers);
+
+            Console.WriteLine(str_numbers);
+
+            // Создаем объект random
+            Random random = new Random();
+            int a = random.Next(); // Положительное число
+            int b = random.Next(10); // Положительное число до 10
+            int c = random.Next(10, 100); // Положительное число от 10 для 100
+            double d = random.NextDouble(); // Число с плавающей запятой от 0 до 1
+
+            Console.WriteLine(String.Format("{0} {1} {2} {3}", a, b, c, d));
+
+            // Создаем новый ПУСТОЙ массив
+            List<int> random_numbers = new List<int>();
+            int count; // переменная для ввода размера массива
+
+            bool isNumber = int.TryParse(Console.ReadLine(), out count);
+            // Если у нас не получилось вытащить число из введенной строки isNumber содержит false
+            // Восклицательный знак означает отрицание, то есть НЕ true => false или НЕ false => true
+            if (!isNumber)
             {
-                // если false
-                Console.WriteLine("Введенное значение не число");
+                // Напомню, что return заканчивает выполнение функции, и может возвращать некое значение
+                // в данном случае заканчиваем выполнение функции Main, при ее завершении - программа
+                // тоже прикращает работу (можно сказать, что Main это и есть наша программа)
+                return;
             }
             
-            // Сборка строки при помощи string.Format(<здесь строка>, <здесь>, <значения которые>, <будем вставлять в строку>)
-            // Первое значение после строки помещается в каждое {0}, второе помещается в каждое {1} и так далее...
-            // (нумерация как в массиве - начинается с нуля)
-            string str_3_val = string.Format("Слово1 Слово2 {0} {1}кг", int_1_val, 10);
-            Console.WriteLine(str_3_val);
+            // Создаем массив из случайных чисел
+            for (int i = 0; i < count; i++)
+            {
+                random_numbers.Add(random.Next(20));
+            }
+            
+            // Собираем строку из массива и печатем ее сразу
+            Console.WriteLine(String.Join(" ", random_numbers));
 
-            // Ожидание ввода любой клавиши (нужно чтобы консоль не закрывалась сразу после отработки программы)
+            // Чтобы у нас не было
             Console.ReadKey();
-            
         }
     }
 }
