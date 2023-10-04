@@ -4,52 +4,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace functions
+namespace multiply_files
 {
     internal class Program
     {
-        // Определение функции. static обязателен! в скобках указывает параметры, которые мы передаем
-        // при вызове и можем использовать внутри функции
-        static int Question(
-            string question,
-            List<string> answerList,
-            int indexRightAnswer
-        )
-        {
-            Console.WriteLine(question);
-            for (int i = 0; i < answerList.Count; i++)
-            {
-                Console.WriteLine(string.Format("{0}) {1}",i ,answerList[i]));
-            }
-
-            int my_answer;
-            bool isRightAnswer = Int32.TryParse(Console.ReadLine(), out my_answer);
-
-            // Восклицательный знак - логическое НЕ, то есть (НЕ true = false), а (НЕ false = true)
-            if (!isRightAnswer)
-            {
-                return 0;
-            }
-
-            if (my_answer == indexRightAnswer)
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
         static void Main(string[] args)
         {
-            int point1 = Question(
-                "Что из этого фрукт?",
-                new List<string>{ "Вишня" , "Яблоко", "Молоко", "Тыква"},
-                1);
-
-            Console.WriteLine(string.Format("Вы набрали {0} очка(ов)",point1));
-            
+            int num1 = Int32.Parse(Console.ReadLine());
+            int num2 = Int32.Parse(Console.ReadLine());
+            string oper = Console.ReadLine();
+            double result;
+            switch (oper)
+            {
+                case "+":
+                    result = Utils.Sum(num1, num2);
+                    break;
+                case "-":
+                    result = Utils.Subtract(num1, num2);
+                    break;
+                case "*":
+                    result = Utils.Multiply(num1, num2);
+                    break;
+                case "/":
+                    result = Utils.Divide(num1, num2);
+                    break;
+                default:
+                    result = 0;
+                    break;
+            }
+            Console.WriteLine(result);
             Console.ReadKey();
         }
     }
