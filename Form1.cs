@@ -8,10 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WindowsFormsApp1
+namespace WindowsFormsApp2
 {
     public partial class Form1 : Form
     {
+        private string first_number = "";
+        private string second_number = "";
+        private bool isFirst = true;
+
         public Form1()
         {
             InitializeComponent();
@@ -19,47 +23,175 @@ namespace WindowsFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string name = textBox1.Text;
-            string surname = textBox2.Text;
-            label3.Text = String.Format("Привет, {0} {1}!", name, surname);
+            if (isFirst)
+            {
+                first_number = first_number + "1";
+            } 
+            else
+            {
+                second_number = second_number + "1";
+            }
         }
 
-        private void label1_Click(object sender, EventArgs e)
+        private void button6_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
+            if (isFirst)
+            {
+                first_number = first_number + "6";
+            }
+            else
+            {
+                second_number = second_number + "6";
+            }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            float oldSize = label3.Font.Size;
-            float newSize = oldSize - 0.25f;
-            label3.Font = new Font(label3.Font.FontFamily, newSize);
+            if (isFirst)
+            {
+                first_number = first_number + "2";
+            }
+            else
+            {
+                second_number = second_number + "2";
+            }
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            float oldSize = label3.Font.Size;
-            float newSize = oldSize + 0.25f;
-            label3.Font = new Font(label3.Font.FontFamily, newSize);
-        }
-
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            if (checkBox1.Checked == true)
+            if (isFirst)
             {
-                button2.Visible = false;
-                button3.Visible = false;
+                first_number = first_number + "3";
             }
             else
             {
-                button2.Visible = true;
-                button3.Visible = true;
+                second_number = second_number + "3";
             }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (isFirst)
+            {
+                first_number = first_number + "4";
+            }
+            else
+            {
+                second_number = second_number + "4";
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (isFirst)
+            {
+                first_number = first_number + "5";
+            }
+            else
+            {
+                second_number = second_number + "5";
+            }
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            if (isFirst)
+            {
+                first_number = first_number + "7";
+            }
+            else
+            {
+                second_number = second_number + "7";
+            }
+
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            if (isFirst)
+            {
+                first_number = first_number + "8";
+            }
+            else
+            {
+                second_number = second_number + "8";
+            }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            if (isFirst)
+            {
+                first_number = first_number + "9";
+            }
+            else
+            {
+                second_number = second_number + "9";
+            }
+        }
+
+        private void button0_Click(object sender, EventArgs e)
+        {
+            if (isFirst)
+            {
+                first_number = first_number + "0";
+            }
+            else
+            {
+                second_number = second_number + "0";
+            }
+        }
+        private string operator_sign = "";
+
+        private void buttonplus_Click(object sender, EventArgs e)
+        {
+            operator_sign = "+";
+            isFirst = false;
+        }
+
+        private void buttonminus_Click(object sender, EventArgs e)
+        {
+            operator_sign = "-";
+            isFirst = false;
+        }
+
+        private void buttonslash_Click(object sender, EventArgs e)
+        {
+            operator_sign = "/";
+            isFirst = false;
+        }
+
+        private void buttonstar_Click(object sender, EventArgs e)
+        {
+            operator_sign = "*";
+            isFirst = false;
+        }
+
+        private void buttonequals_Click(object sender, EventArgs e)
+        {
+            Calculator calculator = new Calculator();
+
+            calculator.FirstNumber = int.Parse(first_number);
+            calculator.SecondNumber = int.Parse(second_number);
+
+            if (operator_sign == "+")
+            {
+                result.Text = calculator.Sum().ToString();
+            }
+            if (operator_sign == "-")
+            {
+                result.Text = calculator.Subtract().ToString();
+            }
+            if (operator_sign == "*")
+            {
+                result.Text = calculator.Multiply().ToString();
+            }
+            if (operator_sign == "/")
+            {
+                result.Text = calculator.Divide().ToString();
+            }
+
+            isFirst = true;
         }
     }
 }
