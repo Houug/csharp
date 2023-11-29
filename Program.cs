@@ -1,83 +1,97 @@
-﻿// Документация к библиотеке
 // https://telegrambots.github.io/book/1/example-bot.html
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
-// Создание бота, вставляем токен из BotFather
 var botClient = new TelegramBotClient("6784029185:AAHGzAR91ncQQSQEGBg22xgD-paIq98P_eY");
 
-// Технические строки (они нужны, но нам пока нет) начало
 using CancellationTokenSource cts = new();
+
+// StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.
 ReceiverOptions receiverOptions = new()
 {
-    AllowedUpdates = Array.Empty<UpdateType>()
+    AllowedUpdates = Array.Empty<UpdateType>() // receive all update types except ChatMember related updates
 };
-// Технические строки (они нужны, но нам пока нет) конец
 
-// Запуск бота
 botClient.StartReceiving(
-    updateHandler: HandleUpdateAsync, // Обработчик обновлений
-    pollingErrorHandler: HandlePollingErrorAsync, // Обработчик ошибок
-    receiverOptions: receiverOptions, // Технические строки (они нужны, но нам пока нет)
-    cancellationToken: cts.Token // Технические строки (они нужны, но нам пока нет)
+    updateHandler: HandleUpdateAsync,
+    pollingErrorHandler: HandlePollingErrorAsync,
+    receiverOptions: receiverOptions,
+    cancellationToken: cts.Token
 );
 
-// Получаем данные о боте
 var me = await botClient.GetMeAsync();
 
-// Выводим в консоль уведомление о запуске бота
 Console.WriteLine($"Start listening for @{me.Username}");
 Console.ReadLine();
 
-// Технические строки (они нужны, но нам пока нет)
+// Send cancellation request to stop bot
 cts.Cancel();
 
-// Обработчк обновлений
 async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 {
-    // Отсеиваем все обновления, которые НЕ являются сообщениями
+    // Only process Message updates: https://core.telegram.org/bots/api#message
     if (update.Message is not { } message)
         return;
-
-    // Если сообщение является текстом, тогда выполняем код внутри
-    if (message.Text is { } messageText) // <-- messageText означает сообщение с текстом
+    // Only process text messages
+    if (message.Text is { } messageText)
     {
-        // Получаем ID чата, в которое пришло сообщение
-        var chatId = message.Chat.Id;
-
-        // Получаем вывод в консоль логов
-        Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
-
-        // Отправка сообщения типа текст
-        Message sentMessage = await botClient.SendTextMessageAsync(
-            chatId: chatId,
-            text: $"Привет, ты отправил сообщение!\n{messageText}",
-            cancellationToken: cancellationToken);
+        // Отбор по команде /cosmos
+        if (message.Text == "/cosmos")
+        {
+            // Создание клавиатуры
+            ReplyKeyboardMarkup keyboard = new(new[]
+            {
+                // каждая строчка здесь - строчка в клавиатуре
+                new KeyboardButton[] { "Меркурий", "Венера" },
+                new KeyboardButton[] { "Земля", "Марс" },
+                new KeyboardButton[] { "Юпитер" },
+                new KeyboardButton[] { "Сатурн", "Уран", "Нептун", "Плутон" }
+            })
+            {
+                ResizeKeyboard = true
+            };
+            Message sentMessage = await botClient.SendTextMessageAsync(
+                   chatId: message.Chat.Id,
+                   text: "Выбери планету:",
+                   // Подключение клавиатуры к сообщению (она открывается при отправке сообщения) 
+                   replyMarkup: keyboard
+            );
+        }
     }
 
-    // Если сообщение является стикером, тогда выполняем код внутри
     if (message.Sticker is { } messageSticker)
     {
-        // Получаем ID чата, в которое пришло сообщение
         var chatId = message.Chat.Id;
 
-        // Получаем вывод в консоль логов
-        Console.WriteLine($"Received a '{messageSticker}' message in chat {chatId}.");
+        Console.WriteLine($"Received a '{messageSticker.FileId}' message in chat {chatId}.");
 
-        // Отправка сообщения типа стикер
+        // Echo received message text
         Message sentMessage = await botClient.SendStickerAsync(
             chatId: chatId,
             sticker: InputFile.FromFileId(message.Sticker.FileId),
             cancellationToken: cancellationToken);
     }
 
-    
+    if (message.Photo is { } messagePhoto)
+    {
+        var chatId = message.Chat.Id;
+
+        Console.WriteLine($"Received a '{messagePhoto}' message in chat {chatId}.");
+        var my_photo_fileid = messagePhoto[messagePhoto.Count() - 1].FileId;
+        // Echo received message text
+        Message sentMessage = await botClient.SendPhotoAsync(
+            chatId: chatId,
+            photo: InputFile.FromFileId(my_photo_fileid),
+            cancellationToken: cancellationToken);
+    }
+
+
 }
 
-// Технические строки (они нужны, но нам пока нет)
 Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
 {
     var ErrorMessage = exception switch
