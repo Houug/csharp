@@ -33,63 +33,108 @@ cts.Cancel();
 
 async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 {
-    // Only process Message updates: https://core.telegram.org/bots/api#message
-    if (update.Message is not { } message)
-        return;
-    // Only process text messages
-    if (message.Text is { } messageText)
+    // Теперь у нас есть 2 блока update.CallbackQuery - обработка callback
+    if (update.CallbackQuery is { } callback)
     {
-        // Отбор по команде /cosmos
-        if (message.Text == "/cosmos")
+        // В callback.Data приходит сообщение из кнопки из поля callbackData
+        if (callback.Data == "правильный")
         {
-            // Создание клавиатуры
-            ReplyKeyboardMarkup keyboard = new(new[]
-            {
-                // каждая строчка здесь - строчка в клавиатуре
-                new KeyboardButton[] { "Меркурий", "Венера" },
-                new KeyboardButton[] { "Земля", "Марс" },
-                new KeyboardButton[] { "Юпитер" },
-                new KeyboardButton[] { "Сатурн", "Уран", "Нептун", "Плутон" }
-            })
-            {
-                ResizeKeyboard = true
-            };
             Message sentMessage = await botClient.SendTextMessageAsync(
-                   chatId: message.Chat.Id,
-                   text: "Выбери планету:",
-                   // Подключение клавиатуры к сообщению (она открывается при отправке сообщения) 
-                   replyMarkup: keyboard
+                    chatId: callback.Message.Chat.Id,
+                    text: "Вы правильно ответили на вопрос"
+            );
+        }
+        if (callback.Data == "неправильный")
+        {
+            Message sentMessage = await botClient.SendTextMessageAsync(
+                    chatId: callback.Message.Chat.Id,
+                    text: "Вы НЕправильно ответили на вопрос"
             );
         }
     }
 
-    if (message.Sticker is { } messageSticker)
+    if (update.Message is { } message)
     {
-        var chatId = message.Chat.Id;
+        // Only process text messages
+        if (message.Text is { } messageText)
+        {
+            // Отбор по команде /cosmos
+            if (message.Text == "/cosmos")
+            {
+                // Создание клавиатуры
+                ReplyKeyboardMarkup keyboard = new(new[]
+                {
+                    // каждая строчка здесь - строчка в клавиатуре
+                    new KeyboardButton[] { "Меркурий", "Венера" },
+                    new KeyboardButton[] { "Земля", "Марс" },
+                    new KeyboardButton[] { "Юпитер" },
+                    new KeyboardButton[] { "Сатурн", "Уран", "Нептун", "Плутон" }
+                })
+                {
+                    ResizeKeyboard = true
+                };
+                Message sentMessage = await botClient.SendTextMessageAsync(
+                       chatId: message.Chat.Id,
+                       text: "Выбери планету:",
+                       // Подключение клавиатуры к сообщению (она открывается при отправке сообщения) 
+                       replyMarkup: keyboard
+                );
+            }
 
-        Console.WriteLine($"Received a '{messageSticker.FileId}' message in chat {chatId}.");
+            if (message.Text == "/quiz")
+            {
+                InlineKeyboardMarkup inlineKeyboard = new(new[]
+                {
+                    // Первая строка
+                    new []
+                    {
+                        InlineKeyboardButton.WithCallbackData(text: "🔴", callbackData: "правильный"),
+                        InlineKeyboardButton.WithCallbackData(text: "🟠", callbackData: "неправильный"),
+                    },
+                    // Вторая строка
+                    new []
+                    {
+                        InlineKeyboardButton.WithCallbackData(text: "🟢", callbackData: "неправильный"),
+                        InlineKeyboardButton.WithCallbackData(text: "💛", callbackData: "неправильный"),
+                    },
+                });
 
-        // Echo received message text
-        Message sentMessage = await botClient.SendStickerAsync(
-            chatId: chatId,
-            sticker: InputFile.FromFileId(message.Sticker.FileId),
-            cancellationToken: cancellationToken);
+                Message sentMessage = await botClient.SendTextMessageAsync(
+                       chatId: message.Chat.Id,
+                       text: "Выбери красный цвет:",
+                       // Подключение клавиатуры к сообщению (она открывается при отправке сообщения) 
+                       replyMarkup: inlineKeyboard
+                );
+            }
+        }
+
+        if (message.Sticker is { } messageSticker)
+        {
+            var chatId = message.Chat.Id;
+
+            Console.WriteLine($"Received a '{messageSticker.FileId}' message in chat {chatId}.");
+
+            // Echo received message text
+            Message sentMessage = await botClient.SendStickerAsync(
+                chatId: chatId,
+                sticker: InputFile.FromFileId(message.Sticker.FileId),
+                cancellationToken: cancellationToken);
+        }
+
+        if (message.Photo is { } messagePhoto)
+        {
+            var chatId = message.Chat.Id;
+
+            Console.WriteLine($"Received a '{messagePhoto}' message in chat {chatId}.");
+            var my_photo_fileid = messagePhoto[messagePhoto.Count() - 1].FileId;
+            // Echo received message text
+            Message sentMessage = await botClient.SendPhotoAsync(
+                chatId: chatId,
+                photo: InputFile.FromFileId(my_photo_fileid),
+                cancellationToken: cancellationToken);
+        }
     }
-
-    if (message.Photo is { } messagePhoto)
-    {
-        var chatId = message.Chat.Id;
-
-        Console.WriteLine($"Received a '{messagePhoto}' message in chat {chatId}.");
-        var my_photo_fileid = messagePhoto[messagePhoto.Count() - 1].FileId;
-        // Echo received message text
-        Message sentMessage = await botClient.SendPhotoAsync(
-            chatId: chatId,
-            photo: InputFile.FromFileId(my_photo_fileid),
-            cancellationToken: cancellationToken);
-    }
-
-
+    
 }
 
 Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
